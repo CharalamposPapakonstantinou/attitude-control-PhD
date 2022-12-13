@@ -7,10 +7,7 @@ A sample of codes developed during the PhD studies regarging a 4-Control Moment 
 
 ## Run
 
-Run in Matlab.
-
-Tested in Matlab 2016b.
-
+.m files run in Matlab 2016b.
 
 
 
