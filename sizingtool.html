@@ -1,0 +1,315 @@
+<html>
+<head>
+	<title>CMG Sizing Tool</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+	<style type="text/css">
+		
+		@import url('https://fonts.googleapis.com/css?family=Montserrat:400,600&display=swap');
+		
+		body{
+			font-family: 'Montserrat', sans-serif;
+			width: 100%;
+			height: 100%;
+			background-color: #B5838D;
+			overflow: hidden;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #3C3A41;
+			margin: 0 auto;
+		}
+		#maindiv{
+			width: 70%;
+			height: 80%;
+			margin-left: auto;
+			margin-right: auto;
+			display: flex;
+			justify-content: center;
+		}
+		input{
+			background-color:#fff;
+			width: 100px;
+			height: 40px;
+			border-style: none;
+			border-radius: 5px;
+			text-align: center;
+			margin-top: 20px;
+		}
+		input::placeholder {  
+			text-align: center; 
+		} 
+		#sidemenu{
+			width: 30%;
+			height: 100%;
+			background-color: #FFB4A2;
+			font-size: 32px;
+			display: flex;
+			justify-content: space-around;
+			flex-flow: column;
+		}
+		.sidemenuitems{
+			height: 100%;
+			display: flex;
+			justify-content: space-around;
+			flex-flow: column;
+			text-align: center;
+			cursor: pointer;
+		}
+		.sidemenuitems:hover{
+			transition: 0.4s;
+			background-color: #FFC4B2;
+		}
+		.sidemenuitems:first-child{
+			background-color: #FFCDB2;
+		}
+		#maintab{
+			width: 50%;
+			background-color: #FFCDB2;
+			overflow: scroll;
+			padding-left: 50px;
+			padding-right: 50px;
+			padding-top: 20px;
+			text-align:left;
+		}
+		h1{
+			text-align: center;
+		}
+
+		button{
+			background-color: #E5989B;
+			font-size: 24px;
+			width: 120px;
+			height: 50px;
+			border-style: none;
+			border-radius: 5px;
+			float: right;
+			color: #3C3A41;
+			margin-bottom: 40px;
+		}
+		button:hover{
+			transition: 0.3s;
+			background-color: #F5A8AB;
+		}
+		button a{
+			text-decoration: none;
+			color: inherit;
+		}
+		#tab2{
+			display: none;
+		}
+		.foot{
+			position: absolute;
+			bottom: 10px;
+			right: 10px;
+			font-size: 12px;
+		}
+		#result1{
+			display: none;
+		}
+		#result2{
+			display: none;
+		}
+		.results{
+			padding-top:50px; 
+		}
+	</style>
+
+</head>
+
+<body >
+	<div id="maindiv">
+		<div id="sidemenu">
+			<div class="sidemenuitems" id="1" onclick="reply_click(this.id)">CMG Sizing</div>
+			<div class="sidemenuitems" id="2" onclick="reply_click(this.id)">Air Bearing Sizing</div>
+		</div>
+		<div id="maintab">
+			<div id="tab1" class="animate__animated">
+				<h1>Control Moment Gyro</h1>
+				Give Satellite Jx, Jy, Jz (in kg m<sup>2</sup>) & mass (kg) 
+				<br>
+				<input id="inertiax" type="" name="" placeholder="Jx in kg m&#178 ">
+				<input id="inertiay" type="" name="" placeholder="Jy in kg m&#178 ">
+				<input id="inertiaz" type="" name="" placeholder="Jz in kg m&#178 ">
+				<input id="mass" type="" name="" placeholder="mass in kg">
+				<br><br>
+				Complete rotation (in deg) in time (in s)  
+				<br>
+				<input id="rot" type="" name="" placeholder="rotation in deg">
+				<input id="time" type="number" name="" min="1" max="30" placeholder="duration" step="0.5" style="width:150px">
+				<br><br>
+				Maximum gimbal rate (in deg/s) 
+				<br>
+				<input id="ddotmax" type="" name="" placeholder="rate in  in deg/s">
+				<br><br>
+				Skew angle (in deg) 
+				<br>
+				<input id="skewangle" type="" name="" placeholder="angle in deg">
+				<br><br>
+				Flywheel angular velocity (in rpm) 
+				<br>
+				<input id="wmega" type="" name="" placeholder="velocity in rpm">
+				<br><br>
+				Flywheel inner & outer diameter (in m) 
+				<br>
+				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Moment_of_inertia_thick_cylinder_h.svg/1200px-Moment_of_inertia_thick_cylinder_h.svg.png" width="128" height="128">
+				<br><input id="r1" type="" name="" placeholder="r1 in m">
+				<input id="r2" type="" name="" placeholder="r2 in m">
+				<br><br>
+				Material density (in kg/m<sup>3</sup>) 
+				<br>
+				<input id="materialdensity" type="" name="" placeholder="density in kg/m&sup3">
+				<br><br>
+				<button id="" onclick="getdata()"><a href="#result1">Calculate</a></button>
+
+				<div id="result1" class="results">
+					<h1>Results</h1>
+					<div id="sat_inertiax"></div><br>
+					<div id="sat_inertiay"></div><br>
+					<div id="sat_inertiaz"></div><br>
+					<div id="N_req"></div><br>
+					<div id="h_0"></div><br>
+					<div id="J_flywheel"></div><br>
+					<div id="flywheel_mass"></div><br>
+					<div id="flywheel_mass"></div><br>
+					<div id="cylinder_height"></div><br>
+					<div id="cylinder_height2"></div><br>
+				</div>
+			</div>
+			<div id="tab2" class="animate__animated">
+				<!-- ///////////////////////////////////////////////////////////////////////// -->
+				<h1>Spherical Air Bearing</h1> 
+				<br>
+				Angle &theta; (in deg) 
+				<br>
+				<input id="surf_theta" type="" name="" placeholder="&theta; in deg">
+				<br><br>
+				Radius (in m) 
+				<br>
+				<input id="surf_radius" type="" name="" placeholder="Radius in m">
+				<br><br>
+				Input pressure (in bar) 
+				<br>
+				<input id="input_pressure" type="" name="" placeholder="pressure in bar">
+				<br><br>
+				Efficiency (in %) 
+				<br>
+				<input id="efficiency" type="" name="" placeholder="Efficiency in %">
+				<br><br>
+				<br><br>
+				<button id="" onClick="getdata_airbearing()"><a href="#result2">Calculate</a></button>
+				
+				<div id="result2" class="results">
+					<h1>Results</h1>
+					<div id="touching_surface"></div><br>
+					<div id="grounding_force"></div><br>
+					<div id="load_capacity"></div><br>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="foot">
+		&copy 2020 Charalampos Papakonstantinou.  All rights reserved.
+	</div>
+</body>
+
+<script type="text/javascript">
+	document.getElementById("time").addEventListener("change", getdata);
+
+	function deg2rad(degrees)
+	{
+		var pi = Math.PI;
+		return degrees * (pi/180);
+	}
+	function rpm2rads(rpms)
+	{
+		return rpms * 0.10472;
+	}
+	function getdata()
+	{
+		document.getElementById('result1').style.display = 'block';
+    // event.target is the element that is clicked (button in this case).
+    var  sx=document.getElementById('inertiax').value;
+    var  sy=document.getElementById('inertiay').value;
+    var  sz=document.getElementById('inertiaz').value;
+    var  m=document.getElementById('mass').value;
+    var  rot=deg2rad(document.getElementById('rot').value);
+    var  time=document.getElementById('time').value;
+    var  ddotmax=deg2rad(document.getElementById('ddotmax').value);
+    var  b=deg2rad(document.getElementById('skewangle').value);
+    var  wmega=rpm2rads(document.getElementById('wmega').value);
+    var  r1=document.getElementById('r1').value;
+    var  r2=document.getElementById('r2').value;
+    var  dens=document.getElementById('materialdensity').value;
+
+    // var  J=(1/12)*m*(Math.pow(sx,2)+Math.pow(sz,2));
+    // var  Jx=(1/12)*m*(Math.pow(sy,2)+Math.pow(sz,2));
+    // var  Jz=(1/12)*m*(Math.pow(sx,2)+Math.pow(sy,2));
+    var  J =sy;
+    var  Jx=sx;
+    var  Jz=sz;
+    var slewrate = rot/time;
+    var Nreq = J*(2*rot/2)/Math.pow((time/2),2);
+    var h0=Nreq/(2*ddotmax*Math.cos(b));
+    var Jflywheel=h0/wmega;
+    var flywheelmass=Jflywheel*2/(Math.pow(r1,2)+Math.pow(r2,2));
+    var heightcylinder=flywheelmass/(dens*Math.PI*(Math.pow(r2,2)-Math.pow(r1,2)));
+    var heightcylinder2=2*Jflywheel/(dens*Math.PI*(Math.pow(r2,4)-Math.pow(r1,4)));
+
+    document.getElementById("sat_inertiax").innerHTML = 'Satellite moment of inertia (x): ' + Jx + ' kg*m^2 ' ;
+    document.getElementById("sat_inertiay").innerHTML = 'Satellite moment of inertia (y): ' + J + ' kg*m^2 ' ;
+    document.getElementById("sat_inertiaz").innerHTML = 'Satellite moment of inertia (z): ' + Jz + ' kg*m^2 ' ;
+// document.getElementById("sl_rate").innerHTML = 'Slew rate : '+ slewrate*180/Math.PI + ' deg/s';
+document.getElementById("N_req").innerHTML ='Required CMG cluster torque : ' + Nreq + ' Nm ' ;
+document.getElementById("h_0").innerHTML = 'Required momentum h0 : '+ h0 + ' Nms';
+document.getElementById("J_flywheel").innerHTML = 'Flywheel disk moment of inertia (local z): '+ Jflywheel + ' kg*m^2';
+document.getElementById("flywheel_mass").innerHTML = 'Flywheel disk mass : '+ flywheelmass + ' kg' + ' or '+ 1000*flywheelmass + 'grams';
+document.getElementById("cylinder_height").innerHTML = 'Cylinder height : '+ heightcylinder + ' m'+ ' or '+ 100*heightcylinder + 'cm' ;
+document.getElementById("cylinder_height2").innerHTML = 'Cylinder height2 : '+ heightcylinder2 + ' m'+ ' or '+ 100*heightcylinder2 + 'cm' ;
+
+
+}
+
+function getdata_airbearing()
+{
+	document.getElementById('result2').style.display = 'block';
+    // event.target is the element that is clicked (button in this case).
+    var  surf_theta=document.getElementById('surf_theta').value;
+    var  R=document.getElementById('surf_radius').value;
+    var  input_pressure=100000*document.getElementById('input_pressure').value; //converted from bar to Pa
+    var  efficiency=document.getElementById('efficiency').value;
+
+    var  S=2*Math.PI*Math.pow(R,2)*(1-Math.cos(deg2rad(surf_theta)));
+    var grounding_force=S*input_pressure;
+    var load_capacity=efficiency*S*input_pressure;
+
+    document.getElementById("touching_surface").innerHTML = 'The active/touching surface is: ' + S + ' m^2 ' ;
+    document.getElementById("grounding_force").innerHTML = 'Grounding force is: ' + grounding_force + ' N --> '+ grounding_force/9.81+' kg ' ;
+    document.getElementById("load_capacity").innerHTML = 'Load capacity is: ' + load_capacity + ' N --> '+ load_capacity/9.81+' kg ' ;
+
+
+}
+
+function reply_click(clicked_id)
+{
+	var buttonnum=(clicked_id);
+	showpage1(buttonnum);
+}
+function showpage1 (buttonnum) {
+
+	for (var i = 1; i <= 2; i++) {
+		if (i==buttonnum){
+			document.getElementById(i).style.background = '#FFCDB2';
+			document.getElementById('tab'+i).classList.add('animate__fadeIn');
+			document.getElementById('tab'+i).style.display = 'block';
+		}else {
+			document.getElementById(i).style.background = '#FFB4A2';
+			document.getElementById('tab'+i).style.display = 'none';
+			document.getElementById('tab'+i).classList.remove('animate__fadeIn');
+
+		}
+	} 
+}
+
+</script>
+
+</html>
