@@ -1,5 +1,5 @@
 
-# PhD - Control Moment Gyroscope Singularity. Avoidance for Agile Spacecraft
+# PhD - Control Moment Gyroscope Singularity Avoidance for Agile Spacecraft
 
 A sample of codes developed during the PhD studies regarging a 4-Control Moment Gyroscope cluster attitude control simulations.
 
