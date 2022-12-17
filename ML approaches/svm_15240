@@ -1,0 +1,140 @@
+from numpy import loadtxt
+from keras.models import Sequential
+from keras.layers import Dense, LeakyReLU
+import numpy as np
+import random
+from keras.layers.normalization import BatchNormalization
+from keras import optimizers
+import pandas as pd
+from keras.layers.normalization import BatchNormalization
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from keras.models import model_from_json
+from pandas import ExcelWriter
+from pandas import ExcelFile
+from keras.utils import plot_model
+from keras.callbacks import CSVLogger
+from keras.callbacks import LearningRateScheduler
+import math
+from keras.utils import to_categorical
+from keras.layers import Dropout
+from sklearn import svm
+
+
+def st_dec(epoch):
+    in_lr=0.01
+    drop=0.9
+    epoch_drop=5
+    lrate=in_lr*math.pow(drop,math.floor((1+epoch)/epoch_drop))
+    if lrate< 0.0000001:
+        lrate=0.0000001
+    return lrate
+
+csv_logger = CSVLogger('training.log', separator=',', append=False)
+
+df = pd.read_excel('datatable-class0-N8-testclassify-big-15240-randomized.xlsx', sheet_name='Sheet1')
+ismatlab=1
+nndata=np.array(df)
+for sf in range(0,80):
+    np.random.shuffle(nndata)
+# print("Column headings:")
+# print(df.columns)
+
+testdata_num=900
+inputdim=8
+outputdim=8
+x=nndata[0:(nndata.shape[0]-testdata_num),0:inputdim]
+x_test=nndata[(nndata.shape[0]-testdata_num):nndata.shape[0],0:inputdim]
+
+y          =np.zeros( (nndata.shape[0]-testdata_num,outputdim) )
+y_test     =np.zeros( (testdata_num,outputdim) )
+# ycat       =np.zeros( (nndata.shape[0]-testdata_num,4,10) )
+# ycat_test  =np.zeros( (testdata_num,4,10) )
+for i in range(0,outputdim):
+    y[:,i]=nndata[0:(nndata.shape[0]-testdata_num),i+inputdim]
+    y_test[:,i]=nndata[(nndata.shape[0]-testdata_num):nndata.shape[0],i+inputdim]
+    # ycat[:,:,i]=to_categorical(y[:,i])
+    # ycat_test[:, :, i] = to_categorical(y_test[:, i])
+
+
+
+scaler = StandardScaler()
+scaler.fit(x)
+x=scaler.transform(x)
+scaler.fit(x_test)
+x_test=scaler.transform(x_test)
+
+ac=[0]*outputdim
+clf=[0]*outputdim
+bestval=0
+for nnind in range(0,outputdim):
+    clf[nnind] = svm.SVC(gamma=3.6, decision_function_shape='ovo',kernel='rbf',verbose=0,shrinking=True)
+    clf[nnind].fit(x, y[:,nnind])
+    print(clf[nnind].score(x_test, y_test[:, nnind]))
+    ac[nnind]=clf[nnind].score(x_test, y_test[:, nnind])
+print('mean ac:',np.mean(ac))
+print('prod ac:',np.prod(ac))
+
+# EVALUATE TOTAL
+truecounter=0
+for i in range (0,testdata_num):
+    testvalues = np.array([x_test[i]])
+    predictiontot=np.array([0]*outputdim)
+    for nnind in range(0, outputdim):
+        predictiontot[nnind]=clf[nnind].predict(testvalues)
+    realoutput=y_test[i]
+    res=np.allclose(predictiontot, realoutput.T, rtol=1e-02, atol=1e-02)
+    if res==1:
+        truecounter=truecounter+1
+        print(realoutput.T)
+print('Total accuracy:',100*truecounter/testdata_num,'%')
+
+
+
+
+########################################################################################################
+########################################################################################################
+########################################################################################################
+########################################################################################################
+from sklearn.svm import SVC
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import svm, datasets
+
+# Select 2 features / variable for the 2D plot that we are going to create.
+X = np.append(x[:,:1],x[:,1:2],axis=1)# we only take the first two features.
+Y = y[:,0]
+
+def make_meshgrid(x, y, h=0.02):
+    x_min, x_max = x.min() - 1, x.max() + 1
+    y_min, y_max = y.min() - 1, y.max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+    return xx, yy
+
+def plot_contours(ax, clf, xx, yy, **params):
+    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+    out = ax.contourf(xx, yy, Z, **params)
+    return out
+
+# model = svm.SVC(kernel='poly')
+model = svm.SVC(gamma=10, decision_function_shape='ovo', kernel='rbf', verbose=0)
+clfmodel = model.fit(X, Y)
+
+fig, ax = plt.subplots()
+# title for the plots
+title = ('Decision surface of RBF SVC ')
+# Set-up grid for plotting.
+X0, X1 = X[:, 0], X[:, 1]
+xx, yy = make_meshgrid(X0, X1)
+
+plot_contours(ax, clfmodel, xx, yy, cmap=plt.cm.coolwarm, alpha=0.8)
+ax.scatter(X0, X1, c=Y, cmap=plt.cm.coolwarm, s=20, edgecolors='k')
+ax.set_ylabel('y label here')
+ax.set_xlabel('x label here')
+ax.set_xticks(())
+ax.set_yticks(())
+ax.set_title(title)
+ax.legend()
+plt.show()
+
